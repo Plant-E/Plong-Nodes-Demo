@@ -22,7 +22,9 @@ let dyd = Math.floor(Math.random() * 2);
 //-----//
 
 
-
+$(document).ready(() => {
+    loadSettings();
+})
 
 document.addEventListener('keydown', (e) => {
     if (e.key == 'Enter') {
@@ -31,12 +33,13 @@ document.addEventListener('keydown', (e) => {
             message.innerHTML = "Game Started";
             message.style.left = 42 + 'vw';
             requestAnimationFrame(() => {
+                console.log('test');
                 dx = Math.floor(Math.random() * 4) + 3;
                 dy = Math.floor(Math.random() * 4) + 3;
                 dxd = Math.floor(Math.random() * 2);
                 dyd = Math.floor(Math.random() * 2);
                 moveBall(dx, dy, dxd, dyd);
-                triggerNode();
+                findNode()
             });
         }
     }
@@ -119,6 +122,107 @@ function moveBall(dx, dy, dxd, dyd) {
     requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
     })
+}
 
+
+//Nodes
+function loadNodes(){
+    const x = _get('x-nodes')
+    const y = _get('y-nodes')
+
+    if(!x || !y){ return; }
+
+    const overlay = $('.overlay');
+
+    for(let y_index = 1; y_index <= y; y_index++){
+        console.log(y_index);
+        overlay.append(`<div class="plants-row" data-y="${y_index}" ></div>`);
+
+        for(let column = 1; column <= x; column ++){
+            $(`.plants-row[data-y=${y_index}]`).append(`<div class="plant" data-y="${y_index}" data-x="${column}" > <i class="fa-solid fa-seedling"></i> </div>`)
+
+        }
+    }
+
+    overlay.addClass('active');
 
 }
+
+function findNode(){
+    const ball_center = getCenter(ballCoord);
+
+    let plant = null;
+    let shortest_distance = Infinity;
+
+    $('.plant.active').removeClass('active');
+
+    $('.plant').each(function(){
+        const plant_coords = $(this).get(0).getBoundingClientRect();
+        const plant_center = getCenter(plant_coords);
+        const distance = getDistance(ball_center, plant_center);
+
+        if(distance < shortest_distance){
+            shortest_distance = distance;
+            plant = $(this);
+        }
+
+    });
+
+    if(plant){
+        plant.addClass('active');
+    }
+
+    requestAnimationFrame(findNode);
+}
+
+//Utility
+function _get(name, def = null) {
+    let result = def;
+    let tmp = [];
+
+    location.search
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+            tmp = item.split("=");
+            if (tmp[0] === name) result = decodeURIComponent(tmp[1]);
+        });
+    return result;
+}
+function getCenter(rect){
+    return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+    };
+}
+const getDistance = (point1, point2) => {
+    return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+};
+
+//Settings
+function loadSettings(){
+    location.search
+        .substr(1)
+        .split("&")
+        .forEach(segment => {
+            const  segment_params = segment.split("=");
+            $(`[data-settings=${segment_params[0]}]`).val(segment_params[1]);
+        });
+
+    loadNodes();
+}
+function setSettings(){
+    const settings = []
+
+    $('[data-settings]').each(function(){
+        settings.push({
+            key: $(this).attr('data-settings'),
+            value: this.value,
+        });
+    })
+
+    const segments = settings.map(setting => `${setting.key}=${setting.value}`);
+    window.location.href = `?${ segments.join('&') }`
+}
+
+//Nodes
