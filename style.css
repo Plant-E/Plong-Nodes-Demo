@@ -115,6 +115,5 @@ body{
   opacity: .25;
 }
 .plant.active{
-  opacity: 1;
   text-shadow: 0 0 50px #ffffff, 0 0 100px #ffffff, 0 0 150px #ffffff, 0 0 200px #ffffff;
 }

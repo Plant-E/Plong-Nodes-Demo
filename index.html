@@ -24,10 +24,27 @@
       <div class="overlay"></div>
     </div>
 
-    <div class="d-flex settings p-2 border rounded-3 position-absolute rounded-pill m-1 top-0 end-0">
-      <input class="form-control rounded-pill mr-1" type="number" placeholder="X Nodes" data-settings="x-nodes" >
-      <input class="form-control rounded-pill mx-1" type="number" placeholder="Y Nodes" data-settings="y-nodes" >
-      <a class="btn btn-success rounded-pill ml-1" onclick="setSettings()" >SET</a>
+    <div class="d-flex align-items-end settings position-absolute rounded-pill m-1 top-0 end-0">
+      <div class="mr-2" >
+        <span>Ball Visible</span>
+        <select class="form-select rounded-pill" data-settings="ball_visible" >
+          <option value="0.125">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="mx-2" >
+        <span>Visualisation&nbsp;distance</span>
+        <input class="form-control rounded-pill" type="number" placeholder="Visualisation distance in pixels" data-settings="visual_distance" value="100" >
+      </div>
+      <div class="mx-2" >
+        <span>X Nodes</span>
+        <input class="form-control rounded-pill" type="number" placeholder="X Nodes" data-settings="x_nodes" >
+      </div>
+      <div class="mx-2">
+        <span>Y Nodes</span>
+        <input class="form-control rounded-pill" type="number" placeholder="Y Nodes" data-settings="y_nodes" >
+      </div>
+      <a class="btn btn-success rounded-pill ml-2" onclick="setSettings()" >SET</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>

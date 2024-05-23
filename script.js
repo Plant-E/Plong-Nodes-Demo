@@ -21,6 +21,7 @@ let dyd = Math.floor(Math.random() * 2);
 
 //-----//
 
+var settings = {};
 
 $(document).ready(() => {
     loadSettings();
@@ -113,6 +114,7 @@ function moveBall(dx, dy, dxd, dyd) {
         ball.style = initialBall.style;
         message.innerHTML = "Press Enter to play PLONG";
         message.style.left = 38 + "vw";
+        loadBallVisibility();
         return;
     }
 
@@ -126,51 +128,26 @@ function moveBall(dx, dy, dxd, dyd) {
 
 
 //Nodes
-function loadNodes(){
-    const x = _get('x-nodes')
-    const y = _get('y-nodes')
-
-    if(!x || !y){ return; }
-
-    const overlay = $('.overlay');
-
-    for(let y_index = 1; y_index <= y; y_index++){
-        console.log(y_index);
-        overlay.append(`<div class="plants-row" data-y="${y_index}" ></div>`);
-
-        for(let column = 1; column <= x; column ++){
-            $(`.plants-row[data-y=${y_index}]`).append(`<div class="plant" data-y="${y_index}" data-x="${column}" > <i class="fa-solid fa-seedling"></i> </div>`)
-
-        }
-    }
-
-    overlay.addClass('active');
-
-}
-
 function findNode(){
     const ball_center = getCenter(ballCoord);
+    const visual_distance = Number(settings.visual_distance);
 
-    let plant = null;
-    let shortest_distance = Infinity;
-
-    $('.plant.active').removeClass('active');
+    $('.plant.active').removeClass('active').css({opacity: ''});
 
     $('.plant').each(function(){
         const plant_coords = $(this).get(0).getBoundingClientRect();
         const plant_center = getCenter(plant_coords);
         const distance = getDistance(ball_center, plant_center);
 
-        if(distance < shortest_distance){
-            shortest_distance = distance;
-            plant = $(this);
+
+        if(distance < visual_distance){
+            let opacity = (1 - (distance / visual_distance)).toFixed(1)
+            if (opacity < 0.25){ opacity = 0.25; }
+
+            $(this).addClass('active').css({opacity: opacity});
         }
 
     });
-
-    if(plant){
-        plant.addClass('active');
-    }
 
     requestAnimationFrame(findNode);
 }
@@ -205,14 +182,19 @@ function loadSettings(){
         .substr(1)
         .split("&")
         .forEach(segment => {
-            const  segment_params = segment.split("=");
-            $(`[data-settings=${segment_params[0]}]`).val(segment_params[1]);
+            const segment_params = segment.split("=");
+            const name = segment_params[0];
+            const value = segment_params[1];
+
+            $(`[data-settings=${name}]`).val(value);
+            settings[name] = value;
         });
 
     loadNodes();
+    loadBallVisibility();
 }
 function setSettings(){
-    const settings = []
+    const settings = [];
 
     $('[data-settings]').each(function(){
         settings.push({
@@ -225,4 +207,27 @@ function setSettings(){
     window.location.href = `?${ segments.join('&') }`
 }
 
-//Nodes
+//Targeted settings
+function loadNodes(){
+    const x = _get('x_nodes')
+    const y = _get('y_nodes')
+
+    if(!x || !y){ return; }
+
+    const overlay = $('.overlay');
+
+    for(let y_index = 1; y_index <= y; y_index++){
+        overlay.append(`<div class="plants-row" data-y="${y_index}" ></div>`);
+
+        for(let column = 1; column <= x; column ++){
+            $(`.plants-row[data-y=${y_index}]`).append(`<div class="plant" data-y="${y_index}" data-x="${column}" > <i class="fa-solid fa-seedling"></i> </div>`)
+
+        }
+    }
+
+    overlay.addClass('active');
+
+}
+function loadBallVisibility(){
+    $(ball).css({opacity: settings.ball_visible})
+}
